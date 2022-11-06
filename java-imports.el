@@ -96,8 +96,8 @@ start (if there are none)."
   (goto-char (point-min))
   ;; package declaration is always in the beginning of a file, so no need to
   ;; reset the point after the first search
-  (let ((package-decl-point (re-search-forward "package .*;" nil t))
-        (import-decl-point (re-search-forward "import .*;" nil t)))
+  (let ((package-decl-point (re-search-forward "package .;?" nil t))
+        (import-decl-point (re-search-forward "import .*;?" nil t)))
     ;; 1. If there are imports in the file - go to the first one
     ;;
     ;; 2. No imports, and the package declaration is available - go to the end
@@ -244,7 +244,10 @@ the current Java-mode buffer"
 
       ;; The insertion itself. Note that the only thing left to do here is to
       ;; insert the import.
-      (insert "import " (concat package "." class-name) ";")
+      (insert "import " (concat package "." class-name))
+      (when (not (eq major-mode 'kotlin-mode))
+        (insert ";"))
+
       full-name)))
 
 ;;;###autoload
