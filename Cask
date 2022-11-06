@@ -13,4 +13,5 @@
  (depends-on "ert-runner")
  (depends-on "s")
  (depends-on "pcache")
- (depends-on "el-mock"))
+ (depends-on "el-mock")
+ (depends-on "kotlin-mode"))
