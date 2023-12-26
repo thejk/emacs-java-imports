@@ -105,6 +105,16 @@
        "import java.util.ArrayList;\n"
        "import java.util.List;\n\n\n")))))
 
+(ert-deftest t-java-add-duplicate-import ()
+  (with-temp-buffer
+    (setq-local java-imports-find-block-function
+                #'java-imports-find-place-sorted-block)
+    (insert "package mypackage;\n\n")
+    (insert "import java.util.List;\n\n\n")
+    (should-error
+     (java-imports-add-import-with-package "List" "java.util")
+     :type 'user-error)))
+
 (ert-deftest t-list-imports ()
   (with-temp-buffer
     (insert "package mypackage;\n")
