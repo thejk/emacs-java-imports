@@ -335,5 +335,53 @@
               "mypackage"))))
       (pcache-destroy-repository java-imports-cache-name))))
 
+
+(ert-deftest t-java-scan-file-with-bad-match ()
+  (let ((java-imports-cache-name "java-imports-test/tmp")
+        (inhibit-message t)
+        (c-initialization-hook nil)
+        (c-mode-common-hook nil)
+        (java-mode-hook nil))
+    (unwind-protect
+        (with-temp-buffer
+          (insert "package com.opera.android.autofill;\n")
+          (insert "\n")
+          (insert "import androidx.annotation.NonNull;\n")
+          (insert "import androidx.annotation.Nullable;\n")
+          (insert "\n")
+          (insert "import org.jni_zero.CalledByNative;\n")
+          (insert "import org.jni_zero.JNINamespace;\n")
+          (insert "\n")
+          (insert "/**\n")
+          (insert " * Autofill information on creditcard, the really import one is the guid, the rest are just\n")
+          (insert " * cached values. You get CreditCard objects from AutofillManager.\n")
+          (insert " */\n")
+          (insert "@JNINamespace(\"opera\")\n")
+          (insert "public class CreditCard extends AutofillItem {}")
+          (java-mode)
+          (java-imports-scan-file)
+          (let ((cache (pcache-repository java-imports-cache-name)))
+            (should
+             (equal
+              (pcache-get cache 'CalledByNative)
+              "org.jni_zero"))
+            (should
+             (equal
+              (pcache-get cache 'JNINamespace)
+              "org.jni_zero"))
+            (should
+             (equal
+              (pcache-get cache 'NonNull)
+              "androidx.annotation"))
+            (should
+             (equal
+              (pcache-get cache 'Nullable)
+              "androidx.annotation"))
+            (should
+             (equal
+              (pcache-get cache 'CreditCard)
+              "com.opera.android.autofill"))))
+      (pcache-destroy-repository java-imports-cache-name))))
+
 ;; End:
 ;;; java-imports-test.el ends here
